@@ -36,7 +36,24 @@ int main()
 
     //init curses screen
     initscr();
+
+    //turn off cursor
     curs_set(0);
+
+    //Enable all mouse events
+    mousemask(ALL_MOUSE_EVENTS, NULL);
+
+    // create pad
+    WINDOW* pad = newpad(200, 150);
+
+    //enable keypad keys input
+    keypad(pad, TRUE);
+
+    wtimeout(pad, 300);
+
+    //get max rows and cols of the terminal to be used later
+    int mxrows = 0, mxcols = 0;
+    getmaxyx(stdscr, mxrows, mxcols);
 
     //display the static information that does not get updated by time
     
@@ -44,22 +61,28 @@ int main()
     
     for (int i = 0; i < computer->Hardware->Length; i++, r+=2)
     {
+        //convert string and print it
         std::string HardwareName = msclr::interop::marshal_as<std::string>(computer->Hardware[i]->Name);
-        mvprintw(r, 0, HardwareName.c_str());
+        mvwprintw(pad, r, 0, HardwareName.c_str());
 
-        r++; //go to the next roow
+        r++; //go to the next row
 
         //Iterate over all available sensors
         for (int j = 0; j < computer->Hardware[i]->Sensors->Length; j++, r++) {
 
+            //convert string and print it
             std::string SensorName = msclr::interop::marshal_as<std::string>(computer->Hardware[i]->Sensors[j]->Name);
-            mvprintw(r, 15, SensorName.c_str());
+            mvwprintw(pad, r, 15, SensorName.c_str());
             
+            //convert string and print it
             std::string SensorType = msclr::interop::marshal_as<std::string>(computer->Hardware[i]->Sensors[j]->SensorType.ToString());
-            mvprintw(r, 35, SensorType.c_str());
+            mvwprintw(pad, r, 35, SensorType.c_str());
         }
     }
 
+    //keeps track of what row of the pad we are on
+    int mypadpos = 0;
+    
     //main runtime loop
     while (1)
     {
@@ -75,9 +98,10 @@ int main()
             //Iterate over all available sensors
             for (int j = 0; j < computer->Hardware[i]->Sensors->Length; j++, r++){
 
-                std::string value;
+                std::string value; //stores the value to print
                     
                 //Error handling
+                //if has value set it else set it to "NULL" text
                 if (computer->Hardware[i]->Sensors[j]->Value.HasValue){
                     value = toString(computer->Hardware[i]->Sensors[j]->Value.Value);
                 }
@@ -85,13 +109,38 @@ int main()
                     value = "NULL";
                 }
 
-                mvprintw(r, 50, value.c_str());
+                //print data
+                mvwprintw(pad, r, 50, value.c_str());
             }
         }
 
-        //refresh screen and wait
-        refresh();
-        Sleep(300);
+        //update pad within the window
+        prefresh(pad, mypadpos, 0, 0, 0, mxrows -1, mxcols - 1);
+        
+        //mouse event
+        MEVENT event;
+
+        //get input
+        char ch = wgetch(pad);
+
+        //check if input is a mouse input
+        if (ch == 27)
+        {
+            //if fetched mouse input without errors
+            if (nc_getmouse(&event) == OK)
+            {
+                //check mouse wheel up
+                if ((event.bstate & BUTTON4_PRESSED) && mypadpos > 0)
+                {
+                    mypadpos--;
+                }
+                //check mouse wheel up
+                else if ((event.bstate & BUTTON5_PRESSED) && mypadpos < 200)
+                {
+                    mypadpos++;
+                }
+            }
+        }
     }
 
     //end curses window
