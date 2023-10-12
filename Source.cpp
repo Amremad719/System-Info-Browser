@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono> //Needed for time functions
 #include <iomanip> //Needed for setprecision()
 #include <sstream> //Needed for stringstream
 #include <curses.h> //to display the info
@@ -43,17 +44,19 @@ int main()
     //Enable all mouse events
     mousemask(ALL_MOUSE_EVENTS, NULL);
 
-    // create pad
+    //create pad that is needed to be able to print as much data as we want and scroll in it
     WINDOW* pad = newpad(200, 150);
 
     //enable keypad keys input
     keypad(pad, TRUE);
 
-    wtimeout(pad, 300);
+    //set timeout period for the wgetch() function
+    wtimeout(pad, 5);
 
     //get max rows and cols of the terminal to be used later
     int mxrows = 0, mxcols = 0;
     getmaxyx(stdscr, mxrows, mxcols);
+
 
     //display the static information that does not get updated by time
     
@@ -80,8 +83,14 @@ int main()
         }
     }
 
+    //end of static data display
+
+
     //keeps track of what row of the pad we are on
     int mypadpos = 0;
+    
+    //keeps track of the last time we polled the data to be used in limiting the poll rate
+    auto prev_time = std::chrono::high_resolution_clock::now();
     
     //main runtime loop
     while (1)
@@ -89,38 +98,48 @@ int main()
         //reset output row
         r = 1;
 
-        //Iterate over all of the available hardware
-        for (int i = 0; i < computer->Hardware->Length; i++, r+=3)
+        //current time to be compared to the last time we polled to limit the poll rate
+        auto now_time = std::chrono::high_resolution_clock::now();
+
+        //check if duration since the last time we polled is grater than the desired rate
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(now_time - prev_time).count() >= 300)
         {
-            //Update hardware data
-            computer->Hardware[i]->Update();
+            //update last data poll time
+            prev_time = now_time;
 
-            //Iterate over all available sensors
-            for (int j = 0; j < computer->Hardware[i]->Sensors->Length; j++, r++){
+            //Iterate over all of the available hardware
+            for (int i = 0; i < computer->Hardware->Length; i++, r+=3)
+            {
+                //Update hardware data
+                computer->Hardware[i]->Update();
 
-                std::string value; //stores the value to print
+                //Iterate over all available sensors
+                for (int j = 0; j < computer->Hardware[i]->Sensors->Length; j++, r++){
+
+                    std::string value; //stores the value to print
                     
-                //Error handling
-                //if has value set it else set it to "NULL" text
-                if (computer->Hardware[i]->Sensors[j]->Value.HasValue){
-                    value = toString(computer->Hardware[i]->Sensors[j]->Value.Value);
-                }
-                else {
-                    value = "NULL";
-                }
+                    //Error handling
+                    //if has value set it else set it to "NULL" text
+                    if (computer->Hardware[i]->Sensors[j]->Value.HasValue){
+                        value = toString(computer->Hardware[i]->Sensors[j]->Value.Value);
+                    }
+                    else {
+                        value = "NULL";
+                    }
 
-                //print data
-                mvwprintw(pad, r, 50, value.c_str());
+                    //print data
+                    mvwprintw(pad, r, 50, value.c_str());
+                }
             }
         }
 
         //update pad within the window
         prefresh(pad, mypadpos, 0, 0, 0, mxrows -1, mxcols - 1);
         
-        //mouse event
+        //mouse event to be used to determine what mouse button was pressed
         MEVENT event;
 
-        //get input
+        //get input form user
         char ch = wgetch(pad);
 
         //check if input is a mouse input
@@ -134,7 +153,7 @@ int main()
                 {
                     mypadpos--;
                 }
-                //check mouse wheel up
+                //check mouse wheel down
                 else if ((event.bstate & BUTTON5_PRESSED) && mypadpos < 200)
                 {
                     mypadpos++;
