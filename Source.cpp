@@ -3,7 +3,6 @@
 #include <iomanip> //Needed for setprecision()
 #include <sstream> //Needed for stringstream
 #include <curses.h> //to display the info
-#include <windows.h> //Needed for the Sleep() function
 #include <msclr\marshal_cppstd.h> //Needed to convert between System::String and std:string
 
 //converts a float to a std::string
@@ -21,6 +20,13 @@ std::string toString(const float& f, const int precision = 4)
 
 int main()
 {
+    //init curses screen
+    initscr();
+
+    //print wait screen and refresh to show to user
+    printw("Loading...... Please wait.");
+    refresh();
+    
     //Initialize main object
     OpenHardwareMonitor::Hardware::Computer^ computer = gcnew OpenHardwareMonitor::Hardware::Computer();
 
@@ -35,9 +41,6 @@ int main()
     //Start the session
     computer->Open();
 
-    //init curses screen
-    initscr();
-
     //turn off cursor
     curs_set(0);
 
@@ -50,7 +53,7 @@ int main()
     //enable keypad keys input
     keypad(pad, TRUE);
 
-    //set timeout period for the wgetch() function
+    //set timeout period for the wgetch() function and therefor limit the update rate of the program
     wtimeout(pad, 5);
 
     //get max rows and cols of the terminal to be used later
@@ -86,29 +89,41 @@ int main()
     //end of static data display
 
 
+    //Clear the waiting text from the display to start displaying the data
+    clear();
+
     //keeps track of what row of the pad we are on
     int mypadpos = 0;
     
     //keeps track of the last time we polled the data to be used in limiting the poll rate
     auto prev_time = std::chrono::high_resolution_clock::now();
+
+    //makrs if it is our time polling the data to avoid waiting for the poll rate limit the first time
+    bool first_poll = 1;
+
+    //the delay for the poll rate of the data in milliseconds
+    int poll_delay = 500;
     
     //main runtime loop
     while (1)
     {
-        //reset output row
-        r = 1;
-
         //current time to be compared to the last time we polled to limit the poll rate
         auto now_time = std::chrono::high_resolution_clock::now();
 
         //check if duration since the last time we polled is grater than the desired rate
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(now_time - prev_time).count() >= 300)
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(now_time - prev_time).count() >= poll_delay || first_poll)
         {
+            //reset output row
+            r = 1;
+            
+            //mark the first_poll boolean as false as it is not the first poll no more
+            first_poll &= 0;
+
             //update last data poll time
             prev_time = now_time;
 
             //Iterate over all of the available hardware
-            for (int i = 0; i < computer->Hardware->Length; i++, r+=3)
+            for (int i = 0; i < computer->Hardware->Length; i++)
             {
                 //Update hardware data
                 computer->Hardware[i]->Update();
@@ -129,6 +144,11 @@ int main()
 
                     //print data
                     mvwprintw(pad, r, 50, value.c_str());
+                }
+                
+                //to avoid printing blank lines at the end because the r is used to determine the last row
+                if (i + 1 < computer->Hardware->Length) {
+                    r += 3;
                 }
             }
         }
@@ -154,7 +174,7 @@ int main()
                     mypadpos--;
                 }
                 //check mouse wheel down
-                else if ((event.bstate & BUTTON5_PRESSED) && mypadpos < 200)
+                else if ((event.bstate & BUTTON5_PRESSED) && mypadpos < r - (mxrows > r ? r : mxrows))
                 {
                     mypadpos++;
                 }
