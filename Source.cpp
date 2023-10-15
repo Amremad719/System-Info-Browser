@@ -1,10 +1,12 @@
 #include <iostream>
 #include <map>
+#include <queue>
 #include <chrono> //Needed for time functions
 #include <iomanip> //Needed for setprecision()
 #include <sstream> //Needed for stringstream
 #include <curses.h> //to display the info
 #include <msclr\marshal_cppstd.h> //Needed to convert between System::String and std:string
+#include "SessionRecorder.h"
 
 /**
 * Takes a float and converts it into a std::string
@@ -46,6 +48,18 @@ std::string toString(const float& f, const int precision = 4, const bool fixed =
 */
 std::map<std::pair<int, int>, int> sensor_screen_row;
 
+/**
+* Buffer for session recording
+* first dimension is hardware index
+* the second dimension is sensor index
+* third dimension is the data
+*/
+//std::vector<std::vector<std::queue<float>>> session_record_buffer;
+
+/**
+* Stores what hardware index and sensor index the free ram sensor is
+*/
+std::pair<int, int> free_ram_index;
 
 /**
 * Updates and prints all sensors data from the computer object on the window object
@@ -54,30 +68,45 @@ std::map<std::pair<int, int>, int> sensor_screen_row;
 * @param computer The computer object to get the hardware info from
 * @param window The Curses window to print the info on
 */
-void updateAndPrintSensorData(OpenHardwareMonitor::Hardware::Computer^ computer, WINDOW* window)
+void updateAndPrintSensorData(OpenHardwareMonitor::Hardware::Computer^ computer, WINDOW* window, bool add_to_buffer = 0)
 {
     //Iterate over all of the available hardware
-    for (int i = 0; i < computer->Hardware->Length; i++)
+    for (int hardware_index = 0; hardware_index < computer->Hardware->Length; hardware_index++)
     {
         //Update hardware data
-        computer->Hardware[i]->Update();
+        computer->Hardware[hardware_index]->Update();
 
         //Iterate over all available sensors
-        for (int j = 0; j < computer->Hardware[i]->Sensors->Length; j++) {
+        for (int sesnor_index = 0; sesnor_index < computer->Hardware[hardware_index]->Sensors->Length; sesnor_index++) {
 
             std::string value; //stores the value to print
 
             //Error handling
             //if has value set it else set it to "NULL" text
-            if (computer->Hardware[i]->Sensors[j]->Value.HasValue) {
-                value = toString(computer->Hardware[i]->Sensors[j]->Value.Value);
+            if (computer->Hardware[hardware_index]->Sensors[sesnor_index]->Value.HasValue) {
+                value = toString(computer->Hardware[hardware_index]->Sensors[sesnor_index]->Value.Value);
+
+                //if add_to_buffer or in other terms if the session is being recorded then add the values to the buffer
+                
+                //yet to be implemented
+                /*
+                session_record_buffer[hardware_index][sesnor_index].push(computer->Hardware[hardware_index]->Sensors[sesnor_index]->Value.Value);
+
+                //check if we exceeded the maximum buffer size, if yes then flush the buffer
+                float free_memory = computer->Hardware[free_ram_index.first]->Sensors[free_ram_index.second]->Value.Value;
+                
+                if (sizeof(session_record_buffer) >= free_memory * 0.1)
+                {
+                    //flush_session_record_buffer();
+                }
+                */
             }
             else {
                 value = "NULL";
             }
 
             //print data
-            mvwprintw(window, sensor_screen_row[std::make_pair(i, j)], 50, value.c_str());
+            mvwprintw(window, sensor_screen_row[std::make_pair(hardware_index, sesnor_index)], 50, value.c_str());
         }
     }
 }
@@ -108,6 +137,11 @@ int printStaticHarwareInfo(OpenHardwareMonitor::Hardware::Computer^ computer, WI
             std::string SensorName = msclr::interop::marshal_as<std::string>(computer->Hardware[hardware_index]->Sensors[sensor_index]->Name);
             mvwprintw(window, current_display_row, 15, SensorName.c_str());
 
+            if (SensorName == "Available Memory")
+            {
+                free_ram_index = { hardware_index, sensor_index };
+            }
+
             //convert string and print it
             std::string SensorType = msclr::interop::marshal_as<std::string>(computer->Hardware[hardware_index]->Sensors[sensor_index]->SensorType.ToString());
             mvwprintw(window, current_display_row, 35, SensorType.c_str());
@@ -120,7 +154,27 @@ int printStaticHarwareInfo(OpenHardwareMonitor::Hardware::Computer^ computer, WI
     return current_display_row;
 }
 
+void printGuide(WINDOW* window)
+{
+    //print the title
+    mvwprintw(window, 0, 20, "Guide");
 
+    //store the menu options
+    std::string options[2] = {
+        "r -> Toggles session recording",
+        "Mouse Scroll -> Scrolls through the data"
+    };
+
+    //print menu options
+    for (int i = 0; i < 2; i++)
+    {
+        //i + 2 to leave a blank line between from the title
+        mvwprintw(window, i + 2, 0, options[i].c_str());
+    }
+
+    //print the final buffer
+    prefresh(window, 0, 0, 0, 75, getmaxy(stdscr) - 1, getmaxx(stdscr) - 1);
+}
 
 int main()
 {
@@ -164,11 +218,15 @@ int main()
     int mxrows = 0, mxcols = 0;
     getmaxyx(stdscr, mxrows, mxcols);
 
+    //Clear the waiting text from the display to start displaying the data
+    clear();
+
     //display the static information that does not get updated by time
     int totalRows = printStaticHarwareInfo(computer, pad);
 
-    //Clear the waiting text from the display to start displaying the data
-    clear();
+    //display guide
+    WINDOW* guidePad = newpad(100, 50);
+    printGuide(guidePad);
 
     //keeps track of what row of the pad we are on
     int mypadpos = 0;
@@ -180,7 +238,7 @@ int main()
     bool first_poll = 1;
 
     //the delay for the poll rate of the data in milliseconds
-    int poll_delay = 500;
+    int poll_delay = 1000;
     
     //main runtime loop
     while (1)
@@ -202,7 +260,7 @@ int main()
         }
 
         //update pad within the window
-        prefresh(pad, mypadpos, 0, 0, 0, mxrows -1, mxcols - 1);
+        prefresh(pad, mypadpos, 0, 0, 0, mxrows - 1, mxcols - guidePad->_maxx - 1);
         
         //mouse event to be used to determine what mouse button was pressed
         MEVENT event;

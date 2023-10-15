@@ -156,12 +156,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="SessionRecorder.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="OpenHardwareMonitorLib">
       <HintPath>Dependencies\OpenHardwareMonitorLib\release\OpenHardwareMonitorLib.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SessionRecorder.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
