@@ -18,6 +18,97 @@ std::string getCurrentDateAndTimeInValidFormat()
     return dateTimeString;
 }
 
+void SessionRecorder::initBuffer(OpenHardwareMonitor::Hardware::Computer^ computer)
+{
+    //resize the hardware count in the session record buffer
+    this->record_buffer.resize(computer->Hardware->Length);
+
+    //iterate over all available hardware
+    for (int hardware_index = 0; hardware_index < computer->Hardware->Length; hardware_index++)
+    {
+        //resize the sensor count of the current hardware of session record buffer
+        this->record_buffer[hardware_index].resize(computer->Hardware[hardware_index]->Sensors->Length);
+    }
+}
+
+void SessionRecorder::printColumnHeaders(OpenHardwareMonitor::Hardware::Computer^ computer)
+{
+    if (this->column_headers_printed) return;
+
+    //iterate over all available hardware
+    for (int hardware_index = 0; hardware_index < computer->Hardware->Length; hardware_index++)
+    {
+        std::string HardwareName = msclr::interop::marshal_as<std::string>(computer->Hardware[hardware_index]->Name);
+
+        for (int sensor_index = 0; sensor_index < computer->Hardware[hardware_index]->Sensors->Length; sensor_index++) {
+
+            //convert string and print it
+            std::string SensorName = msclr::interop::marshal_as<std::string>(computer->Hardware[hardware_index]->Sensors[sensor_index]->Name);
+
+            //convert string and print it
+            std::string SensorType = msclr::interop::marshal_as<std::string>(computer->Hardware[hardware_index]->Sensors[sensor_index]->SensorType.ToString());
+            
+            //construct final header
+            std::string columnHeader = HardwareName + "." + SensorName + "." + SensorType;
+
+            //print column header to stream
+            this->record_stream << columnHeader;
+
+            //if not the final sensor print a comma to seperate the values
+            if (!(hardware_index == computer->Hardware->Length - 1 && sensor_index == computer->Hardware[hardware_index]->Sensors->Length))
+            {
+                this->record_stream << ',';
+            }
+        }
+    }
+    this->record_stream << '\n';
+
+    this->column_headers_printed = 1;
+}
+
+bool SessionRecorder::isRecording()
+{
+    return this->recording_active;
+}
+
+void SessionRecorder::startRecording(OpenHardwareMonitor::Hardware::Computer^ computer)
+{
+    if (this->recording_active) return;
+
+    if (!this->record_stream.is_open())
+    {
+        this->init_stream();
+    }
+
+    this->recording_active = 1;
+
+    printColumnHeaders(computer);
+}
+
+void SessionRecorder::stopRecording()
+{
+    if (!this->recording_active) return;
+
+    if (this->record_stream.is_open())
+    {
+        this->close_stream();
+    }
+
+    initRecordingVariables();
+}
+
+void SessionRecorder::toggleRecording(OpenHardwareMonitor::Hardware::Computer^ computer)
+{
+    if (this->recording_active)
+    {
+        this->stopRecording();
+    }
+    else
+    {
+        this->startRecording(computer);
+    }
+}
+
 void SessionRecorder::init_stream()
 {
     //get current dat and time
@@ -27,35 +118,90 @@ void SessionRecorder::init_stream()
     fileName += ".csv";
 
     //create the file and open the stream
-    session_record_stream.open(fileName);
+    record_stream.open(fileName);
 
     //store the file name without the extension
-    session_record_stream_file_name = fileName.substr(0, fileName.size() - 4);
+    record_stream_file_name = fileName.substr(0, fileName.size() - 4);
 }
 
 void SessionRecorder::flush_buffer()
 {
     //if no output file is open to write to create one
-    if (!session_record_stream.is_open())
+    if (!record_stream.is_open())
     {
         this->init_stream();
     }
 
-    //to be implemented
+    //marks if the buffer is empty or not
+    bool buffer_not_empty = 1;
+
+    do
+    {
+        buffer_not_empty = 0;
+
+        //iterate over all available sensors
+        for (int hardware_index = 0; hardware_index < record_buffer.size(); hardware_index++)
+        {
+            for (int sensor_index = 0; sensor_index < record_buffer[hardware_index].size(); sensor_index++)
+            {
+                //if the queue is not empty
+                if (!record_buffer[hardware_index][sensor_index].empty())
+                {
+                    //mark the buffer as not empty
+                    buffer_not_empty = 1;
+
+                    //write value to the stream
+                    this->record_stream << record_buffer[hardware_index][sensor_index].front();
+
+                    //pop the value from the queue
+                    record_buffer[hardware_index][sensor_index].pop();
+
+                }
+
+                //if not the final sensor print a comma to seperate the values
+                if (!(hardware_index == record_buffer.size() - 1 && sensor_index == record_buffer[hardware_index].size() - 1))
+                {
+                    this->record_stream << ',';
+                }
+            }
+        }
+
+        //end the row
+        this->record_stream << '\n';
+
+    } while (buffer_not_empty);
 }
 
 void SessionRecorder::close_stream()
 {
-    std::string newFileName = session_record_stream_file_name;
+    //flush the remaining contents of the buffer before closing
+    this->flush_buffer();
 
+    //stores the new file name to replace the old one
+    std::string newFileName = record_stream_file_name;
+
+    //get the current time to add to the name
     System::DateTime dateTime = System::DateTime::Now;
 
+    //convert current time to std::string
     std::string currentTime = msclr::interop::marshal_as<std::string>(dateTime.ToLongTimeString());
+    
+    //replace invalid file naming character to valid ones
     std::replace(currentTime.begin(), currentTime.end(), ':', '-');
 
+    //add a dash and the file extension
     newFileName += " - " + currentTime + ".csv";
 
-    session_record_stream.close();
+    //close the stream to create the file if not created
+    record_stream.close();
 
-    std::ignore = rename((session_record_stream_file_name + ".csv").c_str(), newFileName.c_str());
+    //rename the file to the new name
+    std::ignore = rename((record_stream_file_name + ".csv").c_str(), newFileName.c_str());
+}
+
+void SessionRecorder::initRecordingVariables()
+{
+    this->recording_active = 0;
+
+    this->column_headers_printed = 0;
 }

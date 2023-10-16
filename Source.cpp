@@ -1,6 +1,5 @@
 #include <iostream>
 #include <map>
-#include <queue>
 #include <chrono> //Needed for time functions
 #include <iomanip> //Needed for setprecision()
 #include <sstream> //Needed for stringstream
@@ -49,17 +48,14 @@ std::string toString(const float& f, const int precision = 4, const bool fixed =
 std::map<std::pair<int, int>, int> sensor_screen_row;
 
 /**
-* Buffer for session recording
-* first dimension is hardware index
-* the second dimension is sensor index
-* third dimension is the data
-*/
-//std::vector<std::vector<std::queue<float>>> session_record_buffer;
-
-/**
 * Stores what hardware index and sensor index the free ram sensor is
 */
 std::pair<int, int> free_ram_index;
+
+/**
+* The object that manages the recording of the session
+*/
+SessionRecorder sessionRecorder;
 
 /**
 * Updates and prints all sensors data from the computer object on the window object
@@ -81,32 +77,37 @@ void updateAndPrintSensorData(OpenHardwareMonitor::Hardware::Computer^ computer,
 
             std::string value; //stores the value to print
 
+            //if add_to_buffer or in other terms if the session is being recorded then add the values to the buffer
+            if (sessionRecorder.isRecording())
+            {
+                sessionRecorder.record_buffer[hardware_index][sesnor_index].push(computer->Hardware[hardware_index]->Sensors[sesnor_index]->Value.Value);
+            }
+
             //Error handling
             //if has value set it else set it to "NULL" text
             if (computer->Hardware[hardware_index]->Sensors[sesnor_index]->Value.HasValue) {
                 value = toString(computer->Hardware[hardware_index]->Sensors[sesnor_index]->Value.Value);
 
-                //if add_to_buffer or in other terms if the session is being recorded then add the values to the buffer
-                
-                //yet to be implemented
-                /*
-                session_record_buffer[hardware_index][sesnor_index].push(computer->Hardware[hardware_index]->Sensors[sesnor_index]->Value.Value);
-
-                //check if we exceeded the maximum buffer size, if yes then flush the buffer
-                float free_memory = computer->Hardware[free_ram_index.first]->Sensors[free_ram_index.second]->Value.Value;
-                
-                if (sizeof(session_record_buffer) >= free_memory * 0.1)
-                {
-                    //flush_session_record_buffer();
-                }
-                */
             }
-            else {
+            else 
+            {
                 value = "NULL";
             }
 
             //print data
             mvwprintw(window, sensor_screen_row[std::make_pair(hardware_index, sesnor_index)], 50, value.c_str());
+        }
+        //if add_to_buffer or in other terms if the session is being recorded then add the values to the buffer
+        if (sessionRecorder.isRecording())
+        {
+            //check if we exceeded the maximum buffer size, if yes then flush the buffer
+            float free_memory = computer->Hardware[free_ram_index.first]->Sensors[free_ram_index.second]->Value.Value;
+                
+            //if the size of the buffer exceeds the 10% of the current available memory then flush it
+            if (sizeof(sessionRecorder.record_buffer) >= (free_memory * 1024 * 1024 * 1024) * 0.1)
+            {
+                sessionRecorder.flush_buffer();
+            }
         }
     }
 }
@@ -122,8 +123,15 @@ int printStaticHarwareInfo(OpenHardwareMonitor::Hardware::Computer^ computer, WI
 {
     int current_display_row = 0; //keeps track of what row we are displaying on
 
+    //resize the hardware count in the session record buffer
+    sessionRecorder.record_buffer.resize(computer->Hardware->Length);
+
+    //iterate over all available hardware
     for (int hardware_index = 0; hardware_index < computer->Hardware->Length; hardware_index++, current_display_row += 2)
     {
+        //resize the sensor count of the current hardware of session record buffer
+        sessionRecorder.record_buffer[hardware_index].resize(computer->Hardware[hardware_index]->Sensors->Length);
+
         //convert string and print it
         std::string HardwareName = msclr::interop::marshal_as<std::string>(computer->Hardware[hardware_index]->Name);
         mvwprintw(window, current_display_row, 0, HardwareName.c_str());
@@ -269,8 +277,9 @@ int main()
         char ch = wgetch(pad);
 
         //check if input is a mouse input
-        if (ch == 27)
+        switch (ch)
         {
+        case 27:
             //if fetched mouse input without errors
             if (nc_getmouse(&event) == OK)
             {
@@ -286,6 +295,14 @@ int main()
                     mypadpos++;
                 }
             }
+            break;
+
+        case 'r':
+            sessionRecorder.toggleRecording(computer);
+            break;
+
+        default:
+            break;
         }
     }
 
