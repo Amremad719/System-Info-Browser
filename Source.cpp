@@ -101,10 +101,10 @@ void updateAndPrintSensorData(OpenHardwareMonitor::Hardware::Computer^ computer,
         if (sessionRecorder.isRecording())
         {
             //check if we exceeded the maximum buffer size, if yes then flush the buffer
-            float free_memory = computer->Hardware[free_ram_index.first]->Sensors[free_ram_index.second]->Value.Value;
+            double free_memory = computer->Hardware[free_ram_index.first]->Sensors[free_ram_index.second]->Value.Value;
                 
-            //if the size of the buffer exceeds the 10% of the current available memory then flush it
-            if (sizeof(sessionRecorder.record_buffer) >= (free_memory * 1024 * 1024 * 1024) * 0.1)
+            //if the size of the buffer exceeds the 5% of the current available memory then flush it
+            if (sizeof(sessionRecorder.record_buffer) >= (free_memory * 1024LL * 1024 * 1024) * 0.05)
             {
                 sessionRecorder.flush_buffer();
             }
@@ -298,9 +298,26 @@ int main()
             break;
 
         case 'r':
+            //toggle recording
             sessionRecorder.toggleRecording(computer);
+
+            //display/hide recording text to inform user
+            if (sessionRecorder.isRecording())
+            {
+                mvwprintw(guidePad, 29, 18, "Session is being recorded.");
+            }
+            else
+            {
+                mvwprintw(guidePad, 29, 18, "                          ");
+            }
+
+            //update the pad to show the text
+            prefresh(guidePad, 0, 0, 0, 75, mxrows - 1, mxcols - 1);
             break;
 
+        case 'f':
+            sessionRecorder.flush_buffer();
+            break;
         default:
             break;
         }

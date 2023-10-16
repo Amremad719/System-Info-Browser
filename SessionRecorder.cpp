@@ -1,6 +1,7 @@
 #include "SessionRecorder.h"
 #include <tuple>
 #include <algorithm>
+#include <iomanip> //Needed for setprecision()
 #include <msclr\marshal_cppstd.h> //Needed to convert between System::String and std:string
 
 std::string getCurrentDateAndTimeInValidFormat()
@@ -55,7 +56,7 @@ void SessionRecorder::printColumnHeaders(OpenHardwareMonitor::Hardware::Computer
             this->record_stream << columnHeader;
 
             //if not the final sensor print a comma to seperate the values
-            if (!(hardware_index == computer->Hardware->Length - 1 && sensor_index == computer->Hardware[hardware_index]->Sensors->Length))
+            if (!(hardware_index == computer->Hardware->Length - 1 && sensor_index == computer->Hardware[hardware_index]->Sensors->Length - 1))
             {
                 this->record_stream << ',';
             }
@@ -111,17 +112,23 @@ void SessionRecorder::toggleRecording(OpenHardwareMonitor::Hardware::Computer^ c
 
 void SessionRecorder::init_stream()
 {
+    //make direcotory
+    std::ignore = _wmkdir(L"Recordings");
+
     //get current dat and time
-    std::string fileName = getCurrentDateAndTimeInValidFormat();
+    std::string fileName = "Recordings\\" + getCurrentDateAndTimeInValidFormat();
 
     //add the file extension
     fileName += ".csv";
 
     //create the file and open the stream
-    record_stream.open(fileName);
+    this->record_stream.open(fileName);
 
     //store the file name without the extension
-    record_stream_file_name = fileName.substr(0, fileName.size() - 4);
+    this->record_stream_file_name = fileName.substr(0, fileName.size() - 4);
+
+    //set the precision of the decimal output
+    this->record_stream << std::setprecision(9);
 }
 
 void SessionRecorder::flush_buffer()
@@ -139,6 +146,8 @@ void SessionRecorder::flush_buffer()
     {
         buffer_not_empty = 0;
 
+        std::vector<float> values;
+
         //iterate over all available sensors
         for (int hardware_index = 0; hardware_index < record_buffer.size(); hardware_index++)
         {
@@ -151,23 +160,37 @@ void SessionRecorder::flush_buffer()
                     buffer_not_empty = 1;
 
                     //write value to the stream
-                    this->record_stream << record_buffer[hardware_index][sensor_index].front();
+                    values.push_back(record_buffer[hardware_index][sensor_index].front());
 
                     //pop the value from the queue
                     record_buffer[hardware_index][sensor_index].pop();
 
                 }
+            }
+        }
+
+        //if there are values then print them
+        if (values.size())
+        {
+            //iterate over the values
+            for (int value_index = 0; value_index < values.size(); value_index++)
+            {
+                //print the value to the stream
+                this->record_stream << values[value_index];
 
                 //if not the final sensor print a comma to seperate the values
-                if (!(hardware_index == record_buffer.size() - 1 && sensor_index == record_buffer[hardware_index].size() - 1))
+                if (value_index != values.size() - 1)
                 {
                     this->record_stream << ',';
                 }
             }
         }
 
-        //end the row
-        this->record_stream << '\n';
+        //end the row if anything was printed
+        if (buffer_not_empty)
+        {
+            this->record_stream << '\n';
+        }
 
     } while (buffer_not_empty);
 }
