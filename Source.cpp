@@ -1,11 +1,13 @@
 #include <iostream>
 #include <map>
+#include <algorithm>
 #include <chrono> //Needed for time functions
 #include <iomanip> //Needed for setprecision()
 #include <sstream> //Needed for stringstream
 #include <curses.h> //to display the info
 #include <msclr\marshal_cppstd.h> //Needed to convert between System::String and std:string
 #include "SessionRecorder.h"
+#include "StorageInformation.h"
 
 /**
 * Takes a float and converts it into a std::string
@@ -119,7 +121,7 @@ void updateAndPrintSensorData(OpenHardwareMonitor::Hardware::Computer^ computer,
 * @param window The Curses window to print the info on
 * @return The number of rows taken to print all of the info
 */
-int printStaticHarwareInfo(OpenHardwareMonitor::Hardware::Computer^ computer, WINDOW* window)
+int printStaticHarwareInfo(OpenHardwareMonitor::Hardware::Computer^ computer, WINDOW* window, StorageInformation storageInformation)
 {
     int current_display_row = 0; //keeps track of what row we are displaying on
 
@@ -133,8 +135,8 @@ int printStaticHarwareInfo(OpenHardwareMonitor::Hardware::Computer^ computer, WI
         sessionRecorder.record_buffer[hardware_index].resize(computer->Hardware[hardware_index]->Sensors->Length);
 
         //convert string and print it
-        std::string HardwareName = msclr::interop::marshal_as<std::string>(computer->Hardware[hardware_index]->Name);
-        mvwprintw(window, current_display_row, 0, HardwareName.c_str());
+        std::wstring HardwareName = msclr::interop::marshal_as<std::wstring>(computer->Hardware[hardware_index]->Name);
+        mvwprintw(window, current_display_row, 0, std::string(HardwareName.begin(), HardwareName.end()).c_str());
 
         current_display_row++; //go to the next row
 
@@ -229,8 +231,11 @@ int main()
     //Clear the waiting text from the display to start displaying the data
     clear();
 
+    //Initialize static storage information object
+    StorageInformation storageInfo = StorageInformation();
+    
     //display the static information that does not get updated by time
-    int totalRows = printStaticHarwareInfo(computer, pad);
+    int totalRows = printStaticHarwareInfo(computer, pad, storageInfo);
 
     //display guide
     WINDOW* guidePad = newpad(100, 50);

@@ -166,6 +166,7 @@
   <ItemGroup>
     <ClCompile Include="SessionRecorder.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="StorageInformation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="OpenHardwareMonitorLib">
@@ -174,6 +175,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SessionRecorder.h" />
+    <ClInclude Include="StorageInformation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
