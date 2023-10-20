@@ -504,7 +504,7 @@ int main()
 
         case 'r':
             //toggle recording
-            sessionRecorder.toggleRecording(computer);
+            sessionRecorder.toggleRecording(computer, storageInfo);
 
             //display/hide recording text to inform user
             if (sessionRecorder.isRecording())

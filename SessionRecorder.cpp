@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <iomanip> //Needed for setprecision()
 #include <msclr\marshal_cppstd.h> //Needed to convert between System::String and std:string
+#include "StorageInformation.h"
+#include "GlobalFunctions.h"
 
 std::string getCurrentDateAndTimeInValidFormat()
 {
@@ -67,12 +69,72 @@ void SessionRecorder::printColumnHeaders(OpenHardwareMonitor::Hardware::Computer
     this->column_headers_printed = 1;
 }
 
+void SessionRecorder::printStaticInfo(StorageInformation& storageInformation)
+{
+    //if no stream open the return
+    if (!record_stream.is_open()) return;
+
+    //Print physical disks info
+
+    record_stream << "==== Physical Disks info ====\n";
+
+    for (auto PhysicalDisk : storageInformation.PhysicalDisks)
+    {
+        record_stream << std::string(PhysicalDisk.second.MediaType.begin(), PhysicalDisk.second.MediaType.end()) << "====>\n";
+
+        record_stream << "Name," << std::string(PhysicalDisk.second.FriendlyName.begin(), PhysicalDisk.second.FriendlyName.end()) << '\n';
+
+        record_stream << "Bus Type," << std::string(PhysicalDisk.second.BusType.begin(), PhysicalDisk.second.BusType.end()) << '\n';
+
+        record_stream << "Health Status," << std::string(PhysicalDisk.second.HealthStatus.begin(), PhysicalDisk.second.HealthStatus.end()) << '\n';
+
+        record_stream << "Device ID," << std::string(PhysicalDisk.second.DeviceID.begin(), PhysicalDisk.second.DeviceID.end()) << '\n';
+
+        record_stream << "Usage," << std::string(PhysicalDisk.second.Usage.begin(), PhysicalDisk.second.Usage.end()) << '\n';
+
+        record_stream << "Part Number," << std::string(PhysicalDisk.second.partNumber.begin(), PhysicalDisk.second.partNumber.end()) << '\n';
+
+        record_stream << "Physical Sector Size," << PhysicalDisk.second.PhysicalSectorSize << '\n';
+
+        record_stream << "Logical Sector Size," << PhysicalDisk.second.LogicalSectorSize << '\n';
+
+        record_stream << "Allocated Size," << PhysicalDisk.second.AllocatedSize << '\n';
+
+        record_stream << "Size," << PhysicalDisk.second.Size << '\n';
+    }
+
+    //print drives info
+
+    record_stream << "==== Drives info ====\n";
+
+    for (auto Drive : storageInformation.Drives)
+    {
+        record_stream << char(Drive.first - (L'a' - 'a')) << "====>\n";
+
+        record_stream << "Volume Name," << std::string(Drive.second.VolumeName.begin(), Drive.second.VolumeName.end()) << '\n';
+
+        record_stream << "Volume Type," << std::string(Drive.second.VolumeType.begin(), Drive.second.VolumeType.end()) << '\n';
+
+        record_stream << "Bytes Per Sector," << Drive.second.BytesPerSector << '\n';
+
+        record_stream << "Sectors Per Track," << Drive.second.SectorsPerTrack << '\n';
+
+        record_stream << "Tracks Per Cylinder," << Drive.second.TracksPerCylinder << '\n';
+        
+        record_stream << "Volume Serial Number," << Drive.second.VolumeSerialNumber << '\n';
+        
+        record_stream << "Cylinders Quad Part," << Drive.second.Cylinders_QuadPart << '\n';
+    }
+
+    record_stream << "==== Dynamic data ====\n";
+}
+
 bool SessionRecorder::isRecording()
 {
     return this->recording_active;
 }
 
-void SessionRecorder::startRecording(OpenHardwareMonitor::Hardware::Computer^ computer)
+void SessionRecorder::startRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation)
 {
     if (this->recording_active) return;
 
@@ -82,6 +144,8 @@ void SessionRecorder::startRecording(OpenHardwareMonitor::Hardware::Computer^ co
     }
 
     this->recording_active = 1;
+
+    printStaticInfo(storageInformation);
 
     printColumnHeaders(computer);
 }
@@ -98,7 +162,7 @@ void SessionRecorder::stopRecording()
     initRecordingVariables();
 }
 
-void SessionRecorder::toggleRecording(OpenHardwareMonitor::Hardware::Computer^ computer)
+void SessionRecorder::toggleRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation)
 {
     if (this->recording_active)
     {
@@ -106,7 +170,7 @@ void SessionRecorder::toggleRecording(OpenHardwareMonitor::Hardware::Computer^ c
     }
     else
     {
-        this->startRecording(computer);
+        this->startRecording(computer, storageInformation);
     }
 }
 
@@ -128,7 +192,7 @@ void SessionRecorder::init_stream()
     this->record_stream_file_name = fileName.substr(0, fileName.size() - 4);
 
     //set the precision of the decimal output
-    this->record_stream << std::setprecision(9);
+    this->record_stream << std::fixed << std::setprecision(4);
 }
 
 void SessionRecorder::flush_buffer()

@@ -10,7 +10,7 @@
 * @param fixed converts the string with fixed precision if true
 * @return The given float as a std::string
 */
-inline std::string toString(const float& f, const int precision = 4, const bool fixed = 0)
+inline std::string toString(const float& f, const int precision = 4, const bool fixed = 1)
 {
     //stream to be used in the conversion
     std::stringstream ss;
