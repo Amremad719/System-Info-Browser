@@ -1,6 +1,8 @@
 #pragma once
 #include <fstream>
 #include <queue>
+#include "StorageInformation.h"
+#include "NetworkInformation.h"
 
 /**
 * Manages the recording and saving of the given data
@@ -54,6 +56,16 @@ private:
     */
     void printColumnHeaders(OpenHardwareMonitor::Hardware::Computer^ computer);
 
+    /**
+    * Print all static storage information at the beginning of the file
+    */
+    void printStaticStorageInfo(StorageInformation& storageInformation);
+
+    /**
+    * Print all static network information at the beginning of the file
+    */
+    void printStaticNetworkInfo(NetworkInformation& networkInformation);
+
 public:
     /**
     * Buffer for session recording
@@ -79,7 +91,6 @@ public:
         //init_stream();
     }
     
-
     /**
     * Getter for the session_active bool
     * @return If the session is currently being recorded
@@ -89,7 +100,7 @@ public:
     /**
     * Starts the recording of current session
     */
-    void startRecording(OpenHardwareMonitor::Hardware::Computer^ computer);
+    void startRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation);
 
     /**
     * Stops the recording of the current session
@@ -99,7 +110,7 @@ public:
     /**
     * Toggles the recording of the current session
     */
-    void toggleRecording(OpenHardwareMonitor::Hardware::Computer^ computer);
+    void toggleRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation);
 
     /**
     * Flushes the contents of session_record_buffer to the session_record_stream stream

@@ -164,8 +164,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="NetworkInformation.cpp" />
     <ClCompile Include="SessionRecorder.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="StorageInformation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="OpenHardwareMonitorLib">
@@ -173,7 +175,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GlobalFunctions.h" />
+    <ClInclude Include="NetworkInformation.h" />
     <ClInclude Include="SessionRecorder.h" />
+    <ClInclude Include="StorageInformation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
