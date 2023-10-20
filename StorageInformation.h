@@ -82,10 +82,9 @@ public:
 	std::map<wchar_t, Drive> Drives;
 
 	/**
-	* A std::vector of all available physical disks as a PhysicalDrive object
+	* A std::map of all available physical disks as a PhysicalDrive object with the key being the Friendly Name
 	*/
 	std::map<std::wstring, PhysicalDisk> PhysicalDisks;
-	//std::vector<PhysicalDisk> PhysicalDisks;
 
 	StorageInformation()
 	{
