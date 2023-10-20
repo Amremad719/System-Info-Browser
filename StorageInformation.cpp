@@ -38,8 +38,11 @@ void StorageInformation::InitDiskGeometry(const wchar_t DriveLetter)
             NULL
         )) {
 
+            //copy the information to the corresponding object
             this->Drives[DriveLetter].BytesPerSector = diskGeometry.BytesPerSector;
-            this->Drives[DriveLetter].BytesPerSector = diskGeometry.BytesPerSector;
+            this->Drives[DriveLetter].SectorsPerTrack = diskGeometry.SectorsPerTrack;
+            this->Drives[DriveLetter].TracksPerCylinder = diskGeometry.TracksPerCylinder;
+            this->Drives[DriveLetter].Cylinders_QuadPart = diskGeometry.Cylinders.QuadPart;
 
             // Close the handle to the drive
             CloseHandle(hDevice);

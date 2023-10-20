@@ -15,8 +15,10 @@ class StorageInformation
 	struct Drive
 	{
 		unsigned long BytesPerSector;
-		unsigned long Cylinders_QuadPart;
+		unsigned long SectorsPerTrack;
+		unsigned long TracksPerCylinder;
 		unsigned long VolumeSerialNumber;
+		unsigned long Cylinders_QuadPart;
 
 		std::wstring VolumeType;
 		std::wstring VolumeName;
