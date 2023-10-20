@@ -1,6 +1,7 @@
 #pragma once
 #include <fstream>
 #include <queue>
+#include "StorageInformation.h"
 
 /**
 * Manages the recording and saving of the given data
@@ -79,6 +80,10 @@ public:
         //init_stream();
     }
     
+    /**
+    * Print all static information at the beginning of the file
+    */
+    void printStaticInfo(StorageInformation& storageInformation);
 
     /**
     * Getter for the session_active bool
@@ -89,7 +94,7 @@ public:
     /**
     * Starts the recording of current session
     */
-    void startRecording(OpenHardwareMonitor::Hardware::Computer^ computer);
+    void startRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation);
 
     /**
     * Stops the recording of the current session
@@ -99,7 +104,7 @@ public:
     /**
     * Toggles the recording of the current session
     */
-    void toggleRecording(OpenHardwareMonitor::Hardware::Computer^ computer);
+    void toggleRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation);
 
     /**
     * Flushes the contents of session_record_buffer to the session_record_stream stream
