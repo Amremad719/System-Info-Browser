@@ -8,60 +8,7 @@
 #include <msclr\marshal_cppstd.h> //Needed to convert between System::String and std:string
 #include "SessionRecorder.h"
 #include "StorageInformation.h"
-
-/**
-* Takes a float and converts it into a std::string
-* @param f The float to be converted
-* @param precision the number of decimal digits to take from the float
-* @param fixed converts the string with fixed precision if true
-* @return The given float as a std::string
-*/
-std::string toString(const float& f, const int precision = 4, const bool fixed = 0)
-{
-    //stream to be used in the conversion
-    std::stringstream ss;
-    
-    //the result to be returned at the end
-    std::string res;
-
-    //set if the conversion precision is fixed
-    if (fixed)
-    {
-        ss << std::fixed;
-    }
-
-    //set the precision and output the float onto the stream
-    ss << std::setprecision(precision) << f;
-
-    //input the result string from the stream
-    ss >> res;
-
-    //return the result
-    return res;
-}
-
-/**
-* Takes a unsigned long long and converts it into a std::string
-* @param f The long long to be converted
-* @return The given float as a std::string
-*/
-std::string toString(const unsigned long long& f)
-{
-    //stream to be used in the conversion
-    std::stringstream ss;
-
-    //the result to be returned at the end
-    std::string res;
-
-    //output the unsigned long long onto the stream
-    ss << f;
-
-    //input the result string from the stream
-    ss >> res;
-
-    //return the result
-    return res;
-}
+#include "GlobalFunctions.h"
 
 /**
 * A map used to store what row is the hardware sensor on
@@ -98,6 +45,12 @@ void updateAndPrintSensorData(OpenHardwareMonitor::Hardware::Computer^ computer,
 
         //Iterate over all available sensors
         for (int sesnor_index = 0; sesnor_index < computer->Hardware[hardware_index]->Sensors->Length; sesnor_index++) {
+
+            //If there is not a row assigned to the current sensor do not print it
+            if (sensor_screen_row.find(std::make_pair(hardware_index, sesnor_index)) == sensor_screen_row.end())
+            {
+                continue;
+            }
 
             std::string value; //stores the value to print
 
@@ -136,7 +89,14 @@ void updateAndPrintSensorData(OpenHardwareMonitor::Hardware::Computer^ computer,
     }
 }
 
-void PrintPhysicalDiskInfo(WINDOW* window, std::wstring name, int &current_display_row, StorageInformation& storageInformation)
+/**
+* Prints the physical disk info from the PhysicalDisks std::map from the storageInformation parameter
+* @param window The curses window to print the information on
+* @param name The physical disk name
+* @param current_display_row The current current row we are printing on in the curses window object
+* @param storageInformation A StorageInformation object to get the info of the physical disk from
+*/
+void PrintPhysicalDiskInfo(WINDOW* window, const std::wstring name, int &current_display_row, StorageInformation& storageInformation)
 {
     //Print name
     mvwprintw(window, current_display_row, 15, "Device ID");
@@ -211,6 +171,95 @@ void PrintPhysicalDiskInfo(WINDOW* window, std::wstring name, int &current_displ
 }
 
 /**
+* Prints the drive info from the Drives std::map from the storageInformation parameter
+* @param window The curses window to print the information on
+* @param name The drive name
+* @param current_display_row The current current row we are printing on in the curses window object
+* @param storageInformation A StorageInformation object to get the info of the drive from
+*/
+void PrintDriveInfo(WINDOW* window, const wchar_t DriveLetter, int& current_display_row, StorageInformation& storageInformation)
+{
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Bytes Per Sector");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, toString(storageInformation.Drives[DriveLetter].BytesPerSector).c_str());
+    current_display_row++;
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Sectors Per Track");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, toString(storageInformation.Drives[DriveLetter].SectorsPerTrack).c_str());
+    current_display_row++;
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Tracks Per Cylinder");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, toString(storageInformation.Drives[DriveLetter].TracksPerCylinder).c_str());
+    current_display_row++;
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Volume Serial Number");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, toString(storageInformation.Drives[DriveLetter].VolumeSerialNumber).c_str());
+    current_display_row++;
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Cylinders Quad Part");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, toString(storageInformation.Drives[DriveLetter].Cylinders_QuadPart).c_str());
+    current_display_row++;
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "VolumeType");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, std::string(storageInformation.Drives[DriveLetter].VolumeType.begin(), storageInformation.Drives[DriveLetter].VolumeType.end()).c_str());
+    current_display_row++;
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Volume Name");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, std::string(storageInformation.Drives[DriveLetter].VolumeName.begin(), storageInformation.Drives[DriveLetter].VolumeName.end()).c_str());
+    current_display_row++;
+}
+
+/**
+* Prints all available sensors of a given hardware
+* @param computer The computer object to get the hardware info from
+* @param window The curses window to print the info on
+* @param hardware_index The index of the hardware to print the sesnors of
+* @param current_display_row The current current row we are printing on in the curses window object
+*/
+void PrintHardwareSensors(OpenHardwareMonitor::Hardware::Computer^ computer, WINDOW* window, unsigned int hardware_index, int& current_display_row)
+{
+    //Iterate over all available sensors
+    for (int sensor_index = 0; sensor_index < computer->Hardware[hardware_index]->Sensors->Length; sensor_index++, current_display_row++) {
+
+        //convert string and print it
+        std::string SensorName = msclr::interop::marshal_as<std::string>(computer->Hardware[hardware_index]->Sensors[sensor_index]->Name);
+        mvwprintw(window, current_display_row, 15, std::string(SensorName.begin(), SensorName.end()).c_str());
+
+        if (SensorName == "Available Memory")
+        {
+            free_ram_index = { hardware_index, sensor_index };
+        }
+
+        //convert string and print it
+        std::string SensorType = msclr::interop::marshal_as<std::string>(computer->Hardware[hardware_index]->Sensors[sensor_index]->SensorType.ToString());
+        mvwprintw(window, current_display_row, 35, SensorType.c_str());
+
+        //save the position of this sensor to be used in updating the sensor value in printing the dynamic sensor data
+        sensor_screen_row[std::make_pair(hardware_index, sensor_index)] = current_display_row;
+    }
+}
+
+/**
 * Prints the Hardware name and sensor name and data type once as they do not need to be updated
 * @see updateAndPrintSensorData()
 * @param computer The computer object to get the hardware info from
@@ -224,46 +273,94 @@ int printStaticHarwareInfo(OpenHardwareMonitor::Hardware::Computer^ computer, WI
     //resize the hardware count in the session record buffer
     sessionRecorder.record_buffer.resize(computer->Hardware->Length);
 
+    //stores the index of OpenHardwareMonitor storage devices with its name as the key and index as the value
+    std::map<std::string, int> storageDevices;
+
     //iterate over all available hardware
     for (int hardware_index = 0; hardware_index < computer->Hardware->Length; hardware_index++, current_display_row += 2)
     {
         //resize the sensor count of the current hardware of session record buffer
         sessionRecorder.record_buffer[hardware_index].resize(computer->Hardware[hardware_index]->Sensors->Length);
 
-        //convert string and print it
-        std::wstring HardwareName = msclr::interop::marshal_as<std::wstring>(computer->Hardware[hardware_index]->Name);
-        mvwprintw(window, current_display_row, 0, std::string(HardwareName.begin(), HardwareName.end()).c_str());
+        //convert hardware name and store it
+        std::string HardwareName = msclr::interop::marshal_as<std::string>(computer->Hardware[hardware_index]->Name);
+
+        //If device is a storage device then store its index and continue to be used when printing the physical disks
+        if (computer->Hardware[hardware_index]->HardwareType == OpenHardwareMonitor::Hardware::HardwareType::HDD)
+        {
+            //store its index
+            storageDevices[HardwareName] = hardware_index;
+
+            //cancel out the blank lines that gets printed between different hardware because we did not print any hardware
+            current_display_row -= 2;
+
+            continue;
+        }
+        
+        //print hardware name
+        mvwprintw(window, current_display_row, 0, HardwareName.c_str());
 
         current_display_row++; //go to the next row
 
-        //Iterate over all available sensors
-        for (int sensor_index = 0; sensor_index < computer->Hardware[hardware_index]->Sensors->Length; sensor_index++, current_display_row++) {
+        //Print all available sensors of the device
+        PrintHardwareSensors(computer, window, hardware_index, current_display_row);
+    }
 
-            //convert string and print it
-            std::string SensorName = msclr::interop::marshal_as<std::string>(computer->Hardware[hardware_index]->Sensors[sensor_index]->Name);
-            mvwprintw(window, current_display_row, 15, std::string(SensorName.begin(), SensorName.end()).c_str());
+    //Print category name
+    mvwprintw(window, current_display_row, 0, "Storage Devices");
+    current_display_row+=2;
 
-            if (SensorName == "Available Memory")
-            {
-                free_ram_index = { hardware_index, sensor_index };
-            }
+    //Print all physcial disks info
+    for (auto physicalDisk : storageInformation.PhysicalDisks)
+    {
+        //Print disk name
+        mvwprintw(window, current_display_row, 5, std::string(physicalDisk.first.begin(), physicalDisk.first.end()).c_str());
+        current_display_row++;
 
-            //convert string and print it
-            std::string SensorType = msclr::interop::marshal_as<std::string>(computer->Hardware[hardware_index]->Sensors[sensor_index]->SensorType.ToString());
-            mvwprintw(window, current_display_row, 35, SensorType.c_str());
-
-            //save the position of this sensor to be used in updating the sensor value in printing the dynamic sensor data
-            sensor_screen_row[std::make_pair(hardware_index, sensor_index)] = current_display_row;
-        }
-        if (storageInformation.PhysicalDisks.find(HardwareName) != storageInformation.PhysicalDisks.end())
+        //If current disk is recognized by the OpenHardwareMonitor::Computer object
+        if (storageDevices.find(std::string(physicalDisk.second.FriendlyName.begin(), physicalDisk.second.FriendlyName.end())) != storageDevices.end())
         {
-            PrintPhysicalDiskInfo(window, HardwareName, current_display_row, storageInformation);
+            //Print all available sensors of the device
+            PrintHardwareSensors(computer, window, storageDevices[std::string(physicalDisk.second.FriendlyName.begin(), physicalDisk.second.FriendlyName.end())], current_display_row);
         }
+        
+        //Print all static info of the disk
+        PrintPhysicalDiskInfo(window, physicalDisk.first, current_display_row, storageInformation);
+
+        current_display_row+=2;
+    }
+
+    //Print category name
+    mvwprintw(window, current_display_row, 0, "Drives");
+    current_display_row += 2;
+
+    //Print all physcial disks info
+    for (auto Drive : storageInformation.Drives)
+    {
+        //Print drive letter
+
+        //convert character to std::wstring
+        std::wstring DriveLetterWstr;
+        DriveLetterWstr.push_back(Drive.first);
+        DriveLetterWstr.push_back(L':');
+
+        //print it
+        mvwprintw(window, current_display_row, 5, std::string(DriveLetterWstr.begin(), DriveLetterWstr.end()).c_str());
+        current_display_row++;
+
+        //Print all static info of the disk
+        PrintDriveInfo(window, Drive.first, current_display_row, storageInformation);
+
+        current_display_row += 2;
     }
 
     return current_display_row;
 }
 
+/**
+* Prints the guide menu to the curses screen
+* @param window A curses window to print the info on
+*/
 void printGuide(WINDOW* window)
 {
     //print the title
