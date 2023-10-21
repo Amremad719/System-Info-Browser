@@ -171,6 +171,216 @@ void PrintPhysicalDiskInfo(WINDOW* window, const std::wstring name, int &current
     current_display_row++;
 }
 
+void PrintNetworkAdapterInfo(WINDOW* window, const int index, int& current_display_row, NetworkInformation& networkInformation)
+{
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Adapter Type");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, std::string(networkInformation.Adapters[index].AdapterType.begin(), networkInformation.Adapters[index].AdapterType.end()).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Availability");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, std::string(networkInformation.Adapters[index].Availability.begin(), networkInformation.Adapters[index].Availability.end()).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Caption");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, std::string(networkInformation.Adapters[index].Caption.begin(), networkInformation.Adapters[index].Caption.end()).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Description");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, std::string(networkInformation.Adapters[index].Description.begin(), networkInformation.Adapters[index].Description.end()).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Device ID");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, std::string(networkInformation.Adapters[index].DeviceID.begin(), networkInformation.Adapters[index].DeviceID.end()).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "GUID");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, std::string(networkInformation.Adapters[index].GUID.begin(), networkInformation.Adapters[index].GUID.end()).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Index");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, toString(networkInformation.Adapters[index].Index).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Install Date");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, std::string(networkInformation.Adapters[index].InstallDate.begin(), networkInformation.Adapters[index].InstallDate.end()).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Installed");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, toString((int)networkInformation.Adapters[index].Installed).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Interface Index");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, toString(networkInformation.Adapters[index].InterfaceIndex).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "MAC Address");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, std::string(networkInformation.Adapters[index].MACAddress.begin(), networkInformation.Adapters[index].MACAddress.end()).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Manufacturer");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, std::string(networkInformation.Adapters[index].Manufacturer.begin(), networkInformation.Adapters[index].Manufacturer.end()).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Max Number Controlled");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, toString(networkInformation.Adapters[index].MaxNumberControlled).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Max Speed");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, toString((unsigned long long)networkInformation.Adapters[index].MaxSpeed).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Net Connection ID");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, std::string(networkInformation.Adapters[index].NetConnectionID.begin(), networkInformation.Adapters[index].NetConnectionID.end()).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Net Connection Status");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, toString((int)networkInformation.Adapters[index].NetConnectionStatus).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Net Enabled");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, toString((int)networkInformation.Adapters[index].NetEnabled).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Permanent Address");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, std::string(networkInformation.Adapters[index].PermanentAddress.begin(), networkInformation.Adapters[index].PermanentAddress.end()).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Physical Adapter");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, toString((int)networkInformation.Adapters[index].PhysicalAdapter).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "PNP Device ID");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, std::string(networkInformation.Adapters[index].PNPDeviceID.begin(), networkInformation.Adapters[index].PNPDeviceID.end()).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Power Management Supported");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, toString((int)networkInformation.Adapters[index].PowerManagementSupported).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Product Name");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, std::string(networkInformation.Adapters[index].ProductName.begin(), networkInformation.Adapters[index].ProductName.end()).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Service Name");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, std::string(networkInformation.Adapters[index].ServiceName.begin(), networkInformation.Adapters[index].ServiceName.end()).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Net Enabled");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, toString((unsigned long long)networkInformation.Adapters[index].Speed).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Status");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, std::string(networkInformation.Adapters[index].Status.begin(), networkInformation.Adapters[index].Status.end()).c_str());
+    current_display_row++;
+
+
+    //Print name
+    mvwprintw(window, current_display_row, 15, "Time Of Last Reset");
+
+    //print value
+    mvwprintw(window, current_display_row, 50, std::string(networkInformation.Adapters[index].TimeOfLastReset.begin(), networkInformation.Adapters[index].TimeOfLastReset.end()).c_str());
+    current_display_row++;
+}
+
 /**
 * Prints the drive info from the Drives std::map from the storageInformation parameter
 * @param window The curses window to print the information on
@@ -267,7 +477,7 @@ void PrintHardwareSensors(OpenHardwareMonitor::Hardware::Computer^ computer, WIN
 * @param window The Curses window to print the info on
 * @return The number of rows taken to print all of the info
 */
-int printStaticHarwareInfo(OpenHardwareMonitor::Hardware::Computer^ computer, WINDOW* window, StorageInformation& storageInformation)
+int printStaticHarwareInfo(OpenHardwareMonitor::Hardware::Computer^ computer, WINDOW* window, StorageInformation& storageInformation, NetworkInformation& networkInformation)
 {
     int current_display_row = 0; //keeps track of what row we are displaying on
 
@@ -312,7 +522,7 @@ int printStaticHarwareInfo(OpenHardwareMonitor::Hardware::Computer^ computer, WI
     current_display_row+=2;
 
     //Print all physcial disks info
-    for (auto physicalDisk : storageInformation.PhysicalDisks)
+    for (auto& physicalDisk : storageInformation.PhysicalDisks)
     {
         //Print disk name
         mvwprintw(window, current_display_row, 5, std::string(physicalDisk.first.begin(), physicalDisk.first.end()).c_str());
@@ -336,7 +546,7 @@ int printStaticHarwareInfo(OpenHardwareMonitor::Hardware::Computer^ computer, WI
     current_display_row += 2;
 
     //Print all physcial disks info
-    for (auto Drive : storageInformation.Drives)
+    for (auto& Drive : storageInformation.Drives)
     {
         //Print drive letter
 
@@ -351,6 +561,22 @@ int printStaticHarwareInfo(OpenHardwareMonitor::Hardware::Computer^ computer, WI
 
         //Print all static info of the disk
         PrintDriveInfo(window, Drive.first, current_display_row, storageInformation);
+
+        current_display_row += 2;
+    }
+
+    //Print category name
+    mvwprintw(window, current_display_row, 0, "Network adapters");
+    current_display_row += 2;
+
+    for (int adapter_index = 0; adapter_index < networkInformation.Adapters.size(); adapter_index++)
+    {
+        //print name
+        mvwprintw(window, current_display_row, 5, std::string(networkInformation.Adapters[adapter_index].Name.begin(), networkInformation.Adapters[adapter_index].Name.end()).c_str());
+        current_display_row++;
+    
+        //print all static info of the adapter
+        PrintNetworkAdapterInfo(window, adapter_index, current_display_row, networkInformation);
 
         current_display_row += 2;
     }
@@ -381,7 +607,7 @@ void printGuide(WINDOW* window)
     }
 
     //print the final buffer
-    prefresh(window, 0, 0, 0, 75, getmaxy(stdscr) - 1, getmaxx(stdscr) - 1);
+    prefresh(window, 0, 0, 0, 151, getmaxy(stdscr) - 1, getmaxx(stdscr) - 1);
 }
 
 int main()
@@ -391,6 +617,9 @@ int main()
 
     //init curses screen
     initscr();
+
+    //resize terminal
+    resize_term(60, 200);
 
     //print wait screen and refresh to show to user
     printw("Loading...... Please wait.");
@@ -417,7 +646,7 @@ int main()
     mousemask(ALL_MOUSE_EVENTS, NULL);
 
     //create pad that is needed to be able to print as much data as we want and scroll in it
-    WINDOW* pad = newpad(200, 150);
+    WINDOW* pad = newpad(1000, 150);
 
     //enable keypad keys input
     keypad(pad, TRUE);
@@ -439,10 +668,10 @@ int main()
     NetworkInformation networkInfo = NetworkInformation();
     
     //display the static information that does not get updated by time
-    int totalRows = printStaticHarwareInfo(computer, pad, storageInfo);
+    int totalRows = printStaticHarwareInfo(computer, pad, storageInfo, networkInfo);
 
     //display guide
-    WINDOW* guidePad = newpad(100, 50);
+    WINDOW* guidePad = newpad(60, 50);
     printGuide(guidePad);
 
     //keeps track of what row of the pad we are on
@@ -513,15 +742,15 @@ int main()
             //display/hide recording text to inform user
             if (sessionRecorder.isRecording())
             {
-                mvwprintw(guidePad, 29, 18, "Session is being recorded.");
+                mvwprintw(guidePad, 59, 18, "Session is being recorded.");
             }
             else
             {
-                mvwprintw(guidePad, 29, 18, "                          ");
+                mvwprintw(guidePad, 59, 18, "                          ");
             }
 
             //update the pad to show the text
-            prefresh(guidePad, 0, 0, 0, 75, mxrows - 1, mxcols - 1);
+            prefresh(guidePad, 0, 0, 0, 151, mxrows - 1, mxcols - 1);
             break;
 
         case 'f':

@@ -79,3 +79,26 @@ inline std::string toString(const unsigned long& f)
     //return the result
     return res;
 }
+
+/**
+* Takes a unsigned long and converts it into a std::string
+* @param f The unsigned long to be converted
+* @return The given float as a std::string
+*/
+inline std::string toString(const int& f)
+{
+    //stream to be used in the conversion
+    std::stringstream ss;
+
+    //the result to be returned at the end
+    std::string res;
+
+    //output the unsigned long long onto the stream
+    ss << f;
+
+    //input the result string from the stream
+    ss >> res;
+
+    //return the result
+    return res;
+}

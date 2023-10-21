@@ -213,7 +213,7 @@ void NetworkInformation::initAdapters()
 
         //InstallDate
         pclsObj->Get(L"InstallDate", 0, &vtProp, 0, 0);
-        Adapters.rbegin()->InstallDate = msclr::interop::marshal_as<std::wstring>(vtProp.date.ToString());
+        Adapters.rbegin()->InstallDate = std::wstring(vtProp.bstrVal, SysStringLen(vtProp.bstrVal));
         VariantClear(&vtProp);
 
         //Installed
@@ -308,7 +308,7 @@ void NetworkInformation::initAdapters()
 
         //TimeOfLastReset
         pclsObj->Get(L"TimeOfLastReset", 0, &vtProp, 0, 0);
-        Adapters.rbegin()->TimeOfLastReset = msclr::interop::marshal_as<std::wstring>(vtProp.date.ToString());
+        Adapters.rbegin()->TimeOfLastReset = std::wstring(vtProp.bstrVal, SysStringLen(vtProp.bstrVal));
         VariantClear(&vtProp);
 
         pclsObj->Release();
