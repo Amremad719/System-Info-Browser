@@ -66,6 +66,10 @@ private:
     */
     void printStaticNetworkInfo(NetworkInformation& networkInformation);
 
+    /**
+    * Print all static information at the beginning of the file
+    */
+    void printStaticInfo(StorageInformation& storageInformation, NetworkInformation& networkInformation);
 public:
     /**
     * Buffer for session recording
@@ -100,7 +104,7 @@ public:
     /**
     * Starts the recording of current session
     */
-    void startRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation);
+    void startRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation, NetworkInformation& networkInformation);
 
     /**
     * Stops the recording of the current session
@@ -110,7 +114,7 @@ public:
     /**
     * Toggles the recording of the current session
     */
-    void toggleRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation);
+    void toggleRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation, NetworkInformation& networkInformation);
 
     /**
     * Flushes the contents of session_record_buffer to the session_record_stream stream

@@ -10,14 +10,14 @@ class NetworkInformation
     struct NetworkAdapter
     {
         std::wstring                AdapterType;
-        int                         Availability;
+        std::wstring                Availability;
         std::wstring                Caption;
         std::wstring                Description;
         std::wstring                DeviceID;
         std::wstring                GUID;
         int                         Index;
         std::wstring                InstallDate;
-        boolean                     Installed;
+        bool                        Installed;
         int                         InterfaceIndex;
         std::wstring                MACAddress;
         std::wstring                Manufacturer;
@@ -26,13 +26,13 @@ class NetworkInformation
         std::wstring                Name;
         std::wstring                NetConnectionID;
         short                       NetConnectionStatus;
-        boolean                     NetEnabled;
+        bool                        NetEnabled;
         std::vector<std::wstring>   NetworkAddresses;
         std::wstring                PermanentAddress;
-        boolean                     PhysicalAdapter;
+        bool                        PhysicalAdapter;
         std::wstring                PNPDeviceID;
         std::vector<short>          PowerManagementCapabilities;
-        boolean                     PowerManagementSupported;
+        bool                        PowerManagementSupported;
         std::wstring                ProductName;
         std::wstring                ServiceName;
         long long                   Speed;
@@ -40,10 +40,10 @@ class NetworkInformation
         std::wstring                TimeOfLastReset;
     };
 
-    std::vector<NetworkAdapter> Adapters;
-
     void initAdapters();
+
 public:
+    std::vector<NetworkAdapter> Adapters;
 
     NetworkInformation()
     {

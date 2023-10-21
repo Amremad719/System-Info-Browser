@@ -118,73 +118,72 @@ void NetworkInformation::initAdapters()
         switch (vtProp.uintVal)
         {
         case 1:
-            Adapters.rbegin()->AdapterType = L"Other";
+            Adapters.rbegin()->Availability = L"Other";
             break;
         case 2:
-            Adapters.rbegin()->AdapterType = L"Unknown";
+            Adapters.rbegin()->Availability = L"Unknown";
             break;
         case 3:
-            Adapters.rbegin()->AdapterType = L"Running/Full Power";
+            Adapters.rbegin()->Availability = L"Running/Full Power";
             break;
         case 4:
-            Adapters.rbegin()->AdapterType = L"Warning";
+            Adapters.rbegin()->Availability = L"Warning";
             break;
         case 5:
-            Adapters.rbegin()->AdapterType = L"In Test";
+            Adapters.rbegin()->Availability = L"In Test";
             break;
         case 6:
-            Adapters.rbegin()->AdapterType = L"Not Applicable";
+            Adapters.rbegin()->Availability = L"Not Applicable";
             break;
         case 7:
-            Adapters.rbegin()->AdapterType = L"Power Off";
+            Adapters.rbegin()->Availability = L"Power Off";
             break;
         case 8:
-            Adapters.rbegin()->AdapterType = L"Off Line";
+            Adapters.rbegin()->Availability = L"Off Line";
             break;
         case 9:
-            Adapters.rbegin()->AdapterType = L"Off Duty";
+            Adapters.rbegin()->Availability = L"Off Duty";
             break;
         case 10:
-            Adapters.rbegin()->AdapterType = L"Degraded";
+            Adapters.rbegin()->Availability = L"Degraded";
             break;
         case 11:
-            Adapters.rbegin()->AdapterType = L"Not Installed";
+            Adapters.rbegin()->Availability = L"Not Installed";
             break;
         case 12:
-            Adapters.rbegin()->AdapterType = L"Install Error";
+            Adapters.rbegin()->Availability = L"Install Error";
             break;
         case 13:
-            Adapters.rbegin()->AdapterType = L"Power Save - Unknown";
+            Adapters.rbegin()->Availability = L"Power Save - Unknown";
             break;
         case 14:
-            Adapters.rbegin()->AdapterType = L"Power Save - Low Power Mode";
+            Adapters.rbegin()->Availability = L"Power Save - Low Power Mode";
             break;
         case 15:
-            Adapters.rbegin()->AdapterType = L"Power Save - Standby";
+            Adapters.rbegin()->Availability = L"Power Save - Standby";
             break;
         case 16:
-            Adapters.rbegin()->AdapterType = L"Power Cycle";
+            Adapters.rbegin()->Availability = L"Power Cycle";
             break;
         case 17:
-            Adapters.rbegin()->AdapterType = L"Power Save - Warning";
+            Adapters.rbegin()->Availability = L"Power Save - Warning";
             break;
         case 18:
-            Adapters.rbegin()->AdapterType = L"Paused";
+            Adapters.rbegin()->Availability = L"Paused";
             break;
         case 19:
-            Adapters.rbegin()->AdapterType = L"Not Ready";
+            Adapters.rbegin()->Availability = L"Not Ready";
             break;
         case 20:
-            Adapters.rbegin()->AdapterType = L"Not Configured";
+            Adapters.rbegin()->Availability = L"Not Configured";
             break;
         case 21:
-            Adapters.rbegin()->AdapterType = L"Quiesced";
+            Adapters.rbegin()->Availability = L"Quiesced";
             break;
 
         default:
             break;
         }
-        Adapters.rbegin()->Availability = vtProp.uintVal;
         VariantClear(&vtProp);
 
         //Caption

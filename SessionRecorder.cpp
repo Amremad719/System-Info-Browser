@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <iomanip> //Needed for setprecision()
 #include <msclr\marshal_cppstd.h> //Needed to convert between System::String and std:string
-#include "StorageInformation.h"
 #include "GlobalFunctions.h"
 
 std::string getCurrentDateAndTimeInValidFormat()
@@ -78,7 +77,7 @@ void SessionRecorder::printStaticStorageInfo(StorageInformation& storageInformat
 
     record_stream << "==== Physical Disks info ====\n";
 
-    for (auto PhysicalDisk : storageInformation.PhysicalDisks)
+    for (auto& PhysicalDisk : storageInformation.PhysicalDisks)
     {
         record_stream << std::string(PhysicalDisk.second.MediaType.begin(), PhysicalDisk.second.MediaType.end()) << "====>\n";
 
@@ -107,7 +106,7 @@ void SessionRecorder::printStaticStorageInfo(StorageInformation& storageInformat
 
     record_stream << "==== Drives info ====\n";
 
-    for (auto Drive : storageInformation.Drives)
+    for (auto& Drive : storageInformation.Drives)
     {
         record_stream << char(Drive.first - (L'a' - 'a')) << "====>\n";
 
@@ -125,8 +124,82 @@ void SessionRecorder::printStaticStorageInfo(StorageInformation& storageInformat
         
         record_stream << "Cylinders Quad Part," << Drive.second.Cylinders_QuadPart << '\n';
     }
+}
 
-    record_stream << "==== Dynamic data ====\n";
+void SessionRecorder::printStaticNetworkInfo(NetworkInformation& networkInformation)
+{
+    //if no stream open the return
+    if (!record_stream.is_open()) return;
+
+    //Print physical disks info
+
+    record_stream << "==== Network adapters ====\n";
+
+    for (auto& Adapter : networkInformation.Adapters)
+    {
+        record_stream << std::string(Adapter.Name.begin(), Adapter.Name.end()) << "====>\n";
+
+        record_stream << "Adapter Type," << std::string(Adapter.AdapterType.begin(), Adapter.AdapterType.end()) << '\n';
+
+        record_stream << "Availability," << std::string(Adapter.Availability.begin(), Adapter.Availability.end()) << '\n';
+
+        record_stream << "Caption," << std::string(Adapter.Caption.begin(), Adapter.Caption.end()) << '\n';
+
+        record_stream << "Description," << std::string(Adapter.Description.begin(), Adapter.Description.end()) << '\n';
+
+        record_stream << "Device ID," << std::string(Adapter.DeviceID.begin(), Adapter.DeviceID.end()) << '\n';
+            
+        record_stream << "GUID," << std::string(Adapter.GUID.begin(), Adapter.GUID.end()) << '\n';
+    
+        record_stream << "Index," << Adapter.Index << '\n';
+
+        record_stream << "Install Date," << std::string(Adapter.InstallDate.begin(), Adapter.InstallDate.end()) << '\n';
+
+        record_stream << "Installed," << Adapter.Installed << '\n';
+
+        record_stream << "Interface Index," << Adapter.InterfaceIndex << '\n';
+
+        record_stream << "MAC Address," << std::string(Adapter.MACAddress.begin(), Adapter.MACAddress.end()) << '\n';
+
+        record_stream << "Manufacturer," << std::string(Adapter.Manufacturer.begin(), Adapter.Manufacturer.end()) << '\n';
+    
+        record_stream << "Max Number Controlled," << Adapter.MaxNumberControlled << '\n';
+
+        record_stream << "Max Speed," << Adapter.MaxSpeed << '\n';
+
+        record_stream << "Net Connection ID," << std::string(Adapter.NetConnectionID.begin(), Adapter.NetConnectionID.end()) << '\n';
+
+        record_stream << "Net Connection Status," << Adapter.NetConnectionStatus << '\n';
+
+        record_stream << "Net Enabled," << Adapter.NetEnabled << '\n';
+
+        record_stream << "Permanent Address," << std::string(Adapter.PermanentAddress.begin(), Adapter.PermanentAddress.end()) << '\n';
+
+        record_stream << "Physical Adapter," << Adapter.PhysicalAdapter << '\n';
+
+        record_stream << "PNP Device ID," << std::string(Adapter.PNPDeviceID.begin(), Adapter.PNPDeviceID.end()) << '\n';
+
+        record_stream << "Power Management Supported," << Adapter.PowerManagementSupported << '\n';
+
+        record_stream << "Product Name," << std::string(Adapter.ProductName.begin(), Adapter.ProductName.end()) << '\n';
+
+        record_stream << "Service Name," << std::string(Adapter.ServiceName.begin(), Adapter.ServiceName.end()) << '\n';
+
+        record_stream << "Speed," << Adapter.Speed << '\n';
+
+        record_stream << "Status," << std::string(Adapter.Status.begin(), Adapter.Status.end()) << '\n';
+
+        record_stream << "Time Of Last Reset," << std::string(Adapter.TimeOfLastReset.begin(), Adapter.TimeOfLastReset.end()) << '\n';
+    }
+}
+
+void SessionRecorder::printStaticInfo(StorageInformation& storageInformation, NetworkInformation& networkInformation)
+{
+    this->printStaticStorageInfo(storageInformation);
+
+    this->printStaticNetworkInfo(networkInformation);
+
+    this->record_stream << "==== Dynamic data ====\n";
 }
 
 bool SessionRecorder::isRecording()
@@ -134,7 +207,7 @@ bool SessionRecorder::isRecording()
     return this->recording_active;
 }
 
-void SessionRecorder::startRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation)
+void SessionRecorder::startRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation, NetworkInformation& networkInformation)
 {
     if (this->recording_active) return;
 
@@ -145,7 +218,7 @@ void SessionRecorder::startRecording(OpenHardwareMonitor::Hardware::Computer^ co
 
     this->recording_active = 1;
 
-    printStaticInfo(storageInformation);
+    printStaticInfo(storageInformation, networkInformation);
 
     printColumnHeaders(computer);
 }
@@ -162,7 +235,7 @@ void SessionRecorder::stopRecording()
     initRecordingVariables();
 }
 
-void SessionRecorder::toggleRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation)
+void SessionRecorder::toggleRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation, NetworkInformation& networkInformation)
 {
     if (this->recording_active)
     {
@@ -170,7 +243,7 @@ void SessionRecorder::toggleRecording(OpenHardwareMonitor::Hardware::Computer^ c
     }
     else
     {
-        this->startRecording(computer, storageInformation);
+        this->startRecording(computer, storageInformation, networkInformation);
     }
 }
 
