@@ -199,6 +199,7 @@ void SessionRecorder::printStaticInfo(StorageInformation& storageInformation, Ne
 
     this->printStaticNetworkInfo(networkInformation);
 
+    //mark the beginning of the dynamic data
     this->record_stream << "==== Dynamic data ====\n";
 }
 
@@ -209,34 +210,43 @@ bool SessionRecorder::isRecording()
 
 void SessionRecorder::startRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation, NetworkInformation& networkInformation)
 {
+    //if recording is already active then return
     if (this->recording_active) return;
 
+    //initialize variables
+    initRecordingVariables();
+
+    //if the stream is not open initialize it
     if (!this->record_stream.is_open())
     {
         this->init_stream();
     }
 
+    //mark that the recording is active
     this->recording_active = 1;
 
+    //print all static information in the file
     printStaticInfo(storageInformation, networkInformation);
 
+    //print the column headers for the dynamic data
     printColumnHeaders(computer);
 }
 
 void SessionRecorder::stopRecording()
 {
+    //return if recording is not active
     if (!this->recording_active) return;
 
+    //close the stream if it is open
     if (this->record_stream.is_open())
     {
         this->close_stream();
     }
-
-    initRecordingVariables();
 }
 
 void SessionRecorder::toggleRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation, NetworkInformation& networkInformation)
 {
+    //if recording is active then stop recording else if it is not stop the recording
     if (this->recording_active)
     {
         this->stopRecording();

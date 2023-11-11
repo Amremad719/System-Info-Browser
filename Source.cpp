@@ -578,6 +578,7 @@ int printStaticHarwareInfo(OpenHardwareMonitor::Hardware::Computer^ computer, WI
         //print all static info of the adapter
         PrintNetworkAdapterInfo(window, adapter_index, current_display_row, networkInformation);
 
+        //leave a blank line
         current_display_row += 2;
     }
 
@@ -753,9 +754,11 @@ int main()
             prefresh(guidePad, 0, 0, 0, 151, mxrows - 1, mxcols - 1);
             break;
 
+    #ifdef DEBUG
         case 'f':
             sessionRecorder.flush_buffer();
             break;
+    #endif
         default:
             break;
         }
