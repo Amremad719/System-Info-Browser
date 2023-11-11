@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <iomanip> //Needed for setprecision()
 #include <msclr\marshal_cppstd.h> //Needed to convert between System::String and std:string
-#include "GlobalFunctions.h"
 
 std::string getCurrentDateAndTimeInValidFormat()
 {
@@ -208,7 +207,7 @@ bool SessionRecorder::isRecording()
     return this->recording_active;
 }
 
-void SessionRecorder::startRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation, NetworkInformation& networkInformation)
+void SessionRecorder::startRecording(OpenHardwareMonitor::Hardware::Computer^ computer)
 {
     //if recording is already active then return
     if (this->recording_active) return;
@@ -225,10 +224,6 @@ void SessionRecorder::startRecording(OpenHardwareMonitor::Hardware::Computer^ co
     //mark that the recording is active
     this->recording_active = 1;
 
-    //print all static information in the file
-    printStaticInfo(storageInformation, networkInformation);
-
-    //print the column headers for the dynamic data
     printColumnHeaders(computer);
 }
 
@@ -244,7 +239,7 @@ void SessionRecorder::stopRecording()
     }
 }
 
-void SessionRecorder::toggleRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation, NetworkInformation& networkInformation)
+void SessionRecorder::toggleRecording(OpenHardwareMonitor::Hardware::Computer^ computer)
 {
     //if recording is active then stop recording else if it is not stop the recording
     if (this->recording_active)
@@ -253,7 +248,7 @@ void SessionRecorder::toggleRecording(OpenHardwareMonitor::Hardware::Computer^ c
     }
     else
     {
-        this->startRecording(computer, storageInformation, networkInformation);
+        this->startRecording(computer);
     }
 }
 
