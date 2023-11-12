@@ -43,7 +43,7 @@ Follow these steps to build the project using Microsoft Visual C++:
 - Implement the processes information to the session recording.
 - Add operating system information.
 - Make application cross-platform.
-- Add Cmake.
+- Configure Cmake.
 
 ## Usage
 
