@@ -2,7 +2,7 @@
 #include <string>
 #include <iomanip> //Needed for setprecision()
 #include <sstream> //Needed for stringstream
-
+#include <basetsd.h>
 /**
 * Takes a float and converts it into a std::string
 * @param f The float to be converted
@@ -101,4 +101,25 @@ inline std::string toString(const int& f)
 
     //return the result
     return res;
+}
+
+/**
+* Converts a Hexadecimal HMODULE into a std::string
+* @param num The hexadecimal number to convert
+* @return The Hexadecimal in a std::string
+*/
+inline std::string toHex(const HMODULE& num)
+{
+    //create stream
+    std::stringstream ss;
+
+    //set format and output the number
+    ss << std::setfill('0') << std::setw(sizeof(num) * 2) << std::hex << num;
+
+    //create and get the return string
+    std::string value;
+
+    ss >> value;
+
+    return value;
 }

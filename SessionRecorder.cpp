@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iomanip> //Needed for setprecision()
 #include <msclr\marshal_cppstd.h> //Needed to convert between System::String and std:string
+#include "GlobalFunctions.h"
 
 std::string getCurrentDateAndTimeInValidFormat()
 {
@@ -48,7 +49,7 @@ void SessionRecorder::printColumnHeaders(OpenHardwareMonitor::Hardware::Computer
 
             //convert string and print it
             std::string SensorType = msclr::interop::marshal_as<std::string>(computer->Hardware[hardware_index]->Sensors[sensor_index]->SensorType.ToString());
-            
+
             //construct final header
             std::string columnHeader = HardwareName + "." + SensorName + "." + SensorType;
 
@@ -118,9 +119,9 @@ void SessionRecorder::printStaticStorageInfo(StorageInformation& storageInformat
         record_stream << "Sectors Per Track," << Drive.second.SectorsPerTrack << '\n';
 
         record_stream << "Tracks Per Cylinder," << Drive.second.TracksPerCylinder << '\n';
-        
+
         record_stream << "Volume Serial Number," << Drive.second.VolumeSerialNumber << '\n';
-        
+
         record_stream << "Cylinders Quad Part," << Drive.second.Cylinders_QuadPart << '\n';
     }
 }
@@ -147,9 +148,9 @@ void SessionRecorder::printStaticNetworkInfo(NetworkInformation& networkInformat
         record_stream << "Description," << std::string(Adapter.Description.begin(), Adapter.Description.end()) << '\n';
 
         record_stream << "Device ID," << std::string(Adapter.DeviceID.begin(), Adapter.DeviceID.end()) << '\n';
-            
+
         record_stream << "GUID," << std::string(Adapter.GUID.begin(), Adapter.GUID.end()) << '\n';
-    
+
         record_stream << "Index," << Adapter.Index << '\n';
 
         record_stream << "Install Date," << std::string(Adapter.InstallDate.begin(), Adapter.InstallDate.end()) << '\n';
@@ -161,7 +162,7 @@ void SessionRecorder::printStaticNetworkInfo(NetworkInformation& networkInformat
         record_stream << "MAC Address," << std::string(Adapter.MACAddress.begin(), Adapter.MACAddress.end()) << '\n';
 
         record_stream << "Manufacturer," << std::string(Adapter.Manufacturer.begin(), Adapter.Manufacturer.end()) << '\n';
-    
+
         record_stream << "Max Number Controlled," << Adapter.MaxNumberControlled << '\n';
 
         record_stream << "Max Speed," << Adapter.MaxSpeed << '\n';
@@ -207,7 +208,7 @@ bool SessionRecorder::isRecording()
     return this->recording_active;
 }
 
-void SessionRecorder::startRecording(OpenHardwareMonitor::Hardware::Computer^ computer)
+void SessionRecorder::startRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation, NetworkInformation& networkInformation)
 {
     //if recording is already active then return
     if (this->recording_active) return;
@@ -224,6 +225,10 @@ void SessionRecorder::startRecording(OpenHardwareMonitor::Hardware::Computer^ co
     //mark that the recording is active
     this->recording_active = 1;
 
+    //print all static information in the file
+    printStaticInfo(storageInformation, networkInformation);
+
+    //print the column headers for the dynamic data
     printColumnHeaders(computer);
 }
 
@@ -239,7 +244,7 @@ void SessionRecorder::stopRecording()
     }
 }
 
-void SessionRecorder::toggleRecording(OpenHardwareMonitor::Hardware::Computer^ computer)
+void SessionRecorder::toggleRecording(OpenHardwareMonitor::Hardware::Computer^ computer, StorageInformation& storageInformation, NetworkInformation& networkInformation)
 {
     //if recording is active then stop recording else if it is not stop the recording
     if (this->recording_active)
@@ -248,7 +253,7 @@ void SessionRecorder::toggleRecording(OpenHardwareMonitor::Hardware::Computer^ c
     }
     else
     {
-        this->startRecording(computer);
+        this->startRecording(computer, storageInformation, networkInformation);
     }
 }
 
@@ -353,7 +358,7 @@ void SessionRecorder::close_stream()
 
     //convert current time to std::string
     std::string currentTime = msclr::interop::marshal_as<std::string>(dateTime.ToLongTimeString());
-    
+
     //replace invalid file naming character to valid ones
     std::replace(currentTime.begin(), currentTime.end(), ':', '-');
 

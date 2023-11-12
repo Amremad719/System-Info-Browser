@@ -10,15 +10,15 @@
 class SessionRecorder
 {
 private:
-	/**
-	* file output stream used to store the session data
-	*/
-	std::ofstream record_stream;
+    /**
+    * file output stream used to store the session data
+    */
+    std::ofstream record_stream;
 
-	/**
-	* stores the name of the current output file stream
-	*/
-	std::string record_stream_file_name;
+    /**
+    * stores the name of the current output file stream
+    */
+    std::string record_stream_file_name;
 
     /**
     * Marks the state of the recording now
@@ -78,7 +78,7 @@ public:
     * third dimension is the data
     */
     std::vector<std::vector<std::queue<float>>> record_buffer;
-    
+
     /**
     * deconstructor
     */
@@ -94,7 +94,7 @@ public:
     {
         //init_stream();
     }
-    
+
     /**
     * Getter for the session_active bool
     * @return If the session is currently being recorded

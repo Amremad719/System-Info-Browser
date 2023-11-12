@@ -165,6 +165,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="NetworkInformation.cpp" />
+    <ClCompile Include="ProcessesInformation.cpp" />
     <ClCompile Include="SessionRecorder.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="StorageInformation.cpp" />
@@ -177,6 +178,7 @@
   <ItemGroup>
     <ClInclude Include="GlobalFunctions.h" />
     <ClInclude Include="NetworkInformation.h" />
+    <ClInclude Include="ProcessesInformation.h" />
     <ClInclude Include="SessionRecorder.h" />
     <ClInclude Include="StorageInformation.h" />
   </ItemGroup>

@@ -1,5 +1,6 @@
-main library that i am working from: https://github.com/openhardwaremonitor/openhardwaremonitor
-this question guided me to choosing the library: https://stackoverflow.com/questions/23314886/get-cpu-temperature
-oracle curses library function documentation: https://docs.oracle.com/cd/E36784_01/html/E36880/makehtml-id-6.html
-ncurses programming howto: https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/index.html
-gained an idea from this question: https://stackoverflow.com/questions/29370377/scrolling-in-c-with-ncurses-pad
+main library that i am working from: 			https://github.com/openhardwaremonitor/openhardwaremonitor
+this question guided me to choosing the library: 	https://stackoverflow.com/questions/23314886/get-cpu-temperature
+oracle curses library function documentation: 		https://docs.oracle.com/cd/E36784_01/html/E36880/makehtml-id-6.html
+ncurses programming howto: 				https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/index.html
+gained an idea from this question: 			https://stackoverflow.com/questions/29370377/scrolling-in-c-with-ncurses-pad
+cpu usage code from this repo: 				https://github.com/vikyd/cpu_usage
