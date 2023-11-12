@@ -14,7 +14,7 @@ System Info Browser is a C++ project designed to gather comprehensive informatio
 
 The project is currently developed using Microsoft Visual C++ and is intended for Windows platforms. However, there are plans to make the application cross-platform:
 
-- **Linux**: Cross-platform support for Linux is in progress and nearing completion.
+- **Linux**: Cross-platform support for Linux will begin very soon.
 - **macOS**: Support for macOS is under consideration for future releases.
 
 ## Helpful Resources
