@@ -6,7 +6,13 @@ System Info Browser is a C++ project designed to gather comprehensive informatio
 
 ## Features
 
-- Collects information about the host machine.
+- Hardware tempratures.
+- System utilization.
+- Memory information.
+- Storage devices information.
+- Volumes information.
+- Network adapters information.
+- Processes utilization and information.
 - Saves the gathered information to a CSV file for easy analysis and sharing.
 - Small size and fast execution.
 
@@ -14,7 +20,7 @@ System Info Browser is a C++ project designed to gather comprehensive informatio
 
 The project is currently developed using Microsoft Visual C++ and is intended for Windows platforms. However, there are plans to make the application cross-platform:
 
-- **Linux**: Cross-platform support for Linux is in progress and nearing completion.
+- **Linux**: Cross-platform support for Linux will begin very soon.
 - **macOS**: Support for macOS is under consideration for future releases.
 
 ## Helpful Resources
@@ -43,7 +49,7 @@ Follow these steps to build the project using Microsoft Visual C++:
 - Implement the processes information to the session recording.
 - Add operating system information.
 - Make application cross-platform.
-- Add Cmake.
+- Configure Cmake.
 
 ## Usage
 
