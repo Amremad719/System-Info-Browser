@@ -129,7 +129,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)Dependencies\pdcurses_x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Dependencies\pdcurses_x64-windows\include;$(ProjectDir)src\Header files;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>MinSpace</Optimization>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
     </ClCompile>
@@ -149,7 +149,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)Dependencies\pdcurses_x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Dependencies\pdcurses_x64-windows\include;$(ProjectDir)src\Header files;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>MinSpace</Optimization>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
     </ClCompile>
@@ -164,11 +164,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="NetworkInformation.cpp" />
-    <ClCompile Include="ProcessesInformation.cpp" />
-    <ClCompile Include="SessionRecorder.cpp" />
-    <ClCompile Include="Source.cpp" />
-    <ClCompile Include="StorageInformation.cpp" />
+    <ClCompile Include="src\NetworkInformation.cpp" />
+    <ClCompile Include="src\ProcessesInformation.cpp" />
+    <ClCompile Include="src\SessionRecorder.cpp" />
+    <ClCompile Include="src\Source.cpp" />
+    <ClCompile Include="src\StorageInformation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="OpenHardwareMonitorLib">
@@ -176,11 +176,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GlobalFunctions.h" />
-    <ClInclude Include="NetworkInformation.h" />
-    <ClInclude Include="ProcessesInformation.h" />
-    <ClInclude Include="SessionRecorder.h" />
-    <ClInclude Include="StorageInformation.h" />
+    <ClInclude Include="src\Header files\GlobalFunctions.h" />
+    <ClInclude Include="src\Header files\NetworkInformation.h" />
+    <ClInclude Include="src\Header files\ProcessesInformation.h" />
+    <ClInclude Include="src\Header files\SessionRecorder.h" />
+    <ClInclude Include="src\Header files\StorageInformation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

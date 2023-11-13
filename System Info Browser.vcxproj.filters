@@ -15,30 +15,36 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source.cpp">
+    <ClCompile Include="src\NetworkInformation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SessionRecorder.cpp">
+    <ClCompile Include="src\ProcessesInformation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="StorageInformation.cpp">
+    <ClCompile Include="src\SessionRecorder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NetworkInformation.cpp">
+    <ClCompile Include="src\Source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StorageInformation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SessionRecorder.h">
+    <ClInclude Include="src\Header files\GlobalFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="StorageInformation.h">
+    <ClInclude Include="src\Header files\NetworkInformation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GlobalFunctions.h">
+    <ClInclude Include="src\Header files\ProcessesInformation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NetworkInformation.h">
+    <ClInclude Include="src\Header files\SessionRecorder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Header files\StorageInformation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
