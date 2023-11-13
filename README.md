@@ -6,7 +6,13 @@ System Info Browser is a C++ project designed to gather comprehensive informatio
 
 ## Features
 
-- Collects information about the host machine.
+- Hardware tempratures.
+- System utilization.
+- Memory information.
+- Storage devices information.
+- Volumes information.
+- Network adapters information.
+- Processes utilization and information.
 - Saves the gathered information to a CSV file for easy analysis and sharing.
 - Small size and fast execution.
 
