@@ -10,7 +10,7 @@
 
 class ProcessesInformation
 {
-	struct Process
+private: struct Process
 	{
 		unsigned int			ID;
         std::wstring            Path;
@@ -18,7 +18,7 @@ class ProcessesInformation
 		double					CPUUsage;
 		double					DiskUsage;
 		std::string		        BaseAddress;
-		double					MemoryUsage;
+		unsigned long long		MemoryUsage;
 		unsigned long long		SizeOfImage;
 		double					NetworkUsage;
 		unsigned long long		PagefileUsage;
@@ -35,65 +35,73 @@ public: std::map<DWORD, Process> processes;
     * A map and a struct used to store the ProcessTimes of a process with the key being the process ID
     * to be able to get the CPU usage reading accurately
     */
-    struct ProcessTimes
+private: struct ProcessTimes
     {
         int64_t last_time_;
         int64_t last_system_time_;
     };
     std::map<DWORD, ProcessTimes> lastProcessTimes;
 
-    unsigned int NumberOfProcessors;
+private: unsigned int NumberOfProcessors;
 
     /**
     * Fetches the static info about a specific process given its ID in the processes map
     * @param processID The ID of the process to fetch the static info of
     * @see processes()
     */
-    void fetchProcessStaticInfo(const DWORD& processID);
+private: void fetchProcessStaticInfo(const DWORD& processID);
 
     /**
     * Updates the dynamic info about a specific process given its ID in the processes map
     * @param processID The ID of the process to update the dynamic info of
     * @see processes()
     */
-    void updateProcessDynamicInfo(const DWORD& processID);
+private: void updateProcessDynamicInfo(const DWORD& processID);
 
     /**
-    * Updates CPU usage for a certain. Will report inaccurate information if called too quickly, 250ms wait is enough
+    * Gets the current CPU usage of the given process. Will report inaccurate information if called too quickly, 250ms wait is enough
+    * @param processID The ID of the process to get the CPU usage of
+    * @return The precentage of the CPU the process is using
     */
-    double getCPUUsage(const DWORD& processID);
+private: double getCPUUsage(const DWORD& processID);
+
+    /**
+    * Gets the memory usage of the given process
+    * @param processID The ID of the process to get the memory usage of
+    * @return The memory usage of the process in bytes
+    */
+private: unsigned long long getMemoryUsgae(const DWORD& processID);
 
     /**
     * Fetches the static info of all processes in the processes map based on the present keys
     * @see fetchProcessStaticInfo()
     * @see processes()
     */
-    void fetchProcessesStaticInfo();
+private: void fetchProcessesStaticInfo();
 
     /**
     * Fetches the dynamic info of all processes in the processes map based on the present keys
     * @see updateProcessDynamicInfo()
     * @see processes()
     */
-    void updateProcessesDynamicInfo();
+public: void updateProcessesDynamicInfo();
 
     /**
     * Fetches all Processes from the OS and stores them in the processes map
     * @see processes()
     */
-    void fetchProcesses();
+public: void fetchProcesses();
 
     /**
     * Fetches the number of processors from the OS and stores it in NumberOfProcessors
     */
-    void fetchNumberOfProcessors();
+private: void fetchNumberOfProcessors();
 
-    ProcessesInformation() : NumberOfProcessors(0)
+public: ProcessesInformation() : NumberOfProcessors(0)
     {
         //Order is important
 
         fetchNumberOfProcessors();
         fetchProcesses();
-        fetchProcessesStaticInfo();
     }
 };

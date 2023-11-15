@@ -54,6 +54,8 @@ void ProcessesInformation::fetchProcessStaticInfo(const DWORD& processID)
 void ProcessesInformation::updateProcessDynamicInfo(const DWORD& processID)
 {
     this->processes[processID].CPUUsage = getCPUUsage(processID);
+
+    this->processes[processID].MemoryUsage = getMemoryUsgae(processID);
 }
 
 double ProcessesInformation::getCPUUsage(const DWORD& processID)
@@ -151,6 +153,28 @@ double ProcessesInformation::getCPUUsage(const DWORD& processID)
     return cpu;
 }
 
+unsigned long long ProcessesInformation::getMemoryUsgae(const DWORD& processID)
+{
+    //prcess handle
+    HANDLE hProcess;
+
+    //structure that receives information about the memory usage of the process
+    PROCESS_MEMORY_COUNTERS pmc;
+
+    //obtain process handle
+    hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID);
+
+    //return if invalid handle or could not get information
+    if (NULL == hProcess || !GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc)))
+    {
+        return -1;
+    }
+
+    CloseHandle(hProcess);
+
+    return pmc.WorkingSetSize;
+}
+
 void ProcessesInformation::fetchProcessesStaticInfo()
 {
     for (std::pair<const DWORD, Process>& process : this->processes)
@@ -189,6 +213,9 @@ void ProcessesInformation::fetchProcesses()
             this->processes[aProcesses[i]].ID = aProcesses[i];
         }
     }
+
+    //fetch static info
+    fetchProcessesStaticInfo();
 }
 
 void ProcessesInformation::fetchNumberOfProcessors()
